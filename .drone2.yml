@@ -21,7 +21,7 @@ steps:
       - make install
     when:
       branch:
-        - main
+        - master
         - production
 
   - name: sonarqube-code-analysis
