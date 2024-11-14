@@ -6,7 +6,7 @@ platform:
 steps:
   - name: run-test
     pull: if-not-exists
-    image: docker.twistbioscience-staging.com/devops_slave_python:3.10
+    image: docker.twistbioscience-staging.com/devops_slave_python:3.8
     commands:
       - export LC_ALL=C.UTF-8
       - export LANG=C.UTF-8
@@ -15,7 +15,7 @@ steps:
       - export VIRTUAL_ENV=$DRONE_WORKSPACE/venv
       - pip install pip --upgrade
       - pip install virtualenv
-      - virtualenv -p python3.10 venv
+      - virtualenv -p python3.8 venv
       - /bin/bash -c "source $VIRTUAL_ENV/bin/activate"
       - export PATH=$VIRTUAL_ENV/bin:$PATH
       - make install
@@ -39,7 +39,7 @@ steps:
 
   - name: publish
     pull: if-not-exists
-    image: docker.twistbioscience-staging.com/devops_slave_python:3.10
+    image: docker.twistbioscience-staging.com/devops_slave_python:3.8
     commands:
       - make dist
       - make release
