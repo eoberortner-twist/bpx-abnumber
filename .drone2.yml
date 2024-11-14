@@ -1,0 +1,56 @@
+kind: pipeline
+name: default
+platform:
+  os: linux
+  arch: amd64
+steps:
+  - name: run-test
+    pull: if-not-exists
+    image: docker.twistbioscience-staging.com/devops_slave_python:3.10
+    commands:
+      - export LC_ALL=C.UTF-8
+      - export LANG=C.UTF-8
+      - export LANGUAGE=en_US.UTF-8
+      - apt-get update && apt-get install -y groff groff-base less && apt-get install -y wget && apt-get clean
+      - export VIRTUAL_ENV=$DRONE_WORKSPACE/venv
+      - pip install pip --upgrade
+      - pip install virtualenv
+      - virtualenv -p python3.10 venv
+      - /bin/bash -c "source $VIRTUAL_ENV/bin/activate"
+      - export PATH=$VIRTUAL_ENV/bin:$PATH
+      - make install
+    when:
+      branch:
+        - main
+        - production
+
+  - name: sonarqube-code-analysis
+    pull: if-not-exists
+    image: aosapps/drone-sonar-plugin
+    settings:
+      sonar_host: https://sonar.twistbioscience-tools.com
+      usingProperties: true
+    when:
+      branch:
+        - production
+        - main
+      event:
+        - push
+
+  - name: publish
+    pull: if-not-exists
+    image: docker.twistbioscience-staging.com/devops_slave_python:3.10
+    commands:
+      - make dist
+      - make release
+    tags:
+      - "${DRONE_COMMIT_BRANCH}.1.0.0.latest"
+      - "${DRONE_COMMIT_BRANCH}.${DRONE_COMMIT:0:8}.${DRONE_BUILD_NUMBER}"
+      - "${DRONE_COMMIT_BRANCH}.1.0.0.${DRONE_BUILD_NUMBER}"
+      - "${DRONE_COMMIT_BRANCH}.latest"
+    when:
+      branch:
+        - production
+
+image_pull_secrets:
+  - .dockerconfigjson

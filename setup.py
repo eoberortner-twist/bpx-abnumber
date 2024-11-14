@@ -27,7 +27,7 @@ setup(
     url='https://github.com/prihoda/abnumber',
     install_requires=[
         "biopython",
-        "pandas"
-        # ANARCI dependency specified through Bioconda
+        "pandas",
+	# ANARCI & HMMER are installed via source in the Makefile
     ],
 )

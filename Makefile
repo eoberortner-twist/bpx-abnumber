@@ -1,6 +1,7 @@
 .PHONY: install release dist test
  
 install:
+	/bin/sh install_deps.sh
 	pip install -e .
 
 release:
@@ -16,6 +17,7 @@ endif
 	@echo "Create a new release version on: https://github.com/prihoda/abnumber/releases"
 
 dist:
+	/bin/sh install_deps.sh
 	python setup.py sdist bdist_wheel
 
 test: unit-test jupyter-test
